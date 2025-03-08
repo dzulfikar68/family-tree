@@ -38,15 +38,26 @@
             <button type="submit" class="btn btn-primary">Tambahkan</button>
         </form>
         <hr>
+        <p style="font-style: italic;">Action:</p>
         <button id="exportImage" class="btn btn-success">Print Image</button>
         <button id="exportCsv" class="btn btn-warning">Export CSV</button>
-        <input type="file" id="importCsv" class="form-control mt-2" accept=".csv">
+        <hr>
+        <!-- <div style="display: flex; "> -->
+            <p style="font-style: italic;">Import CSV:</p>
+            <input type="file" id="importCsv" class="form-control mt-2" accept=".csv">
+        <!-- </div> -->
         <br>
         <br>
         <br>
-        <button id="deleteSelected" class="btn btn-danger">Hapus Node Terpilih</button>
-        <h3 class="text-center">Diagram Family Tree</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="text-center" style="flex-grow: 1; margin: 0;">Diagram Family Tree</h3>
+            <button id="deleteSelected" class="btn btn-danger">Hapus Node Terpilih</button>
+        </div>
+        <br>
         <div id="familyTree"></div>
+        <br>
+        <br>
+        <br>
     </div>
     <script>
         var familyData = [];
