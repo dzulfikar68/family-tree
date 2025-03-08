@@ -44,6 +44,7 @@
         <br>
         <br>
         <br>
+        <button id="deleteSelected" class="btn btn-danger">Hapus Node Terpilih</button>
         <h3 class="text-center">Diagram Family Tree</h3>
         <div id="familyTree"></div>
     </div>
@@ -53,7 +54,12 @@
         function initDiagram() {
             var $ = go.GraphObject.make;
             myDiagram = $(go.Diagram, "familyTree", {
-                layout: $(go.TreeLayout, { angle: 90, layerSpacing: 35 })
+                layout: $(go.TreeLayout, { angle: 90, layerSpacing: 35 }),
+                "click": function(e) {
+                    if (e.diagram.selection.count === 0) {
+                        e.diagram.clearSelection();
+                    }
+                }
             });
             
             myDiagram.nodeTemplate = $(go.Node, "Auto",
@@ -132,19 +138,6 @@
                 document.body.appendChild(link);
                 link.click();
             });
-            // $('#importCsv').change(function(event) {
-            //     var file = event.target.files[0];
-            //     if (!file) return;
-            //     var reader = new FileReader();
-            //     reader.onload = function(e) {
-            //         var csv = e.target.result;
-            //         var lines = csv.split("\n").map(line => line.split(","));
-            //         familyData = lines.filter(parts => parts.length === 3).map(parts => ({ id: parts[0], name: parts[1], parent: parts[2] || null }));
-            //         updateTree();
-            //         updateDropdowns();
-            //     };
-            //     reader.readAsText(file);
-            // });
             $('#importCsv').change(function(event) {
                 var file = event.target.files[0];
                 if (!file) return;
@@ -155,12 +148,21 @@
                     familyData = lines.filter(parts => parts.length === 3).map(parts => ({
                         id: parts[0],
                         name: parts[1],
-                        parent: parts[2] && parts[2] !== "null" ? parts[2] : undefined // Modifikasi disini
+                        parent: parts[2] && parts[2] !== "null" ? parts[2] : undefined
                     }));
                     updateTree();
                     updateDropdowns();
                 };
                 reader.readAsText(file);
+            });
+            $('#deleteSelected').click(function() {
+                let selectedNode = myDiagram.selection.first();
+                if (selectedNode) {
+                    let nodeData = selectedNode.data;
+                    familyData = familyData.filter(person => person.id !== nodeData.key);
+                    updateTree();
+                    updateDropdowns();
+                }
             });
         });
         function updateTree() {
