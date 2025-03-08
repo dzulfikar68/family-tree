@@ -121,6 +121,7 @@
                 updateTree();
                 updateDropdowns();
                 $('#familyForm')[0].reset();
+                window.scrollTo(0, document.body.scrollHeight); // Tambahkan baris ini
             });
             $('#exportImage').click(function() {
                 var img = myDiagram.makeImageData({ background: "white" });
