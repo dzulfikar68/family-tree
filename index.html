@@ -38,6 +38,12 @@
             <button type="submit" class="btn btn-primary">Tambahkan</button>
         </form>
         <hr>
+        <button id="exportImage" class="btn btn-success">Print Image</button>
+        <button id="exportCsv" class="btn btn-warning">Export CSV</button>
+        <input type="file" id="importCsv" class="form-control mt-2" accept=".csv">
+        <br>
+        <br>
+        <br>
         <h3 class="text-center">Diagram Family Tree</h3>
         <div id="familyTree"></div>
     </div>
@@ -58,24 +64,6 @@
             );
             
             myDiagram.linkTemplate = $(go.Link, $(go.Shape));
-
-            myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
-                var node = e.subject.part;
-                if (node) {
-                    var newName = prompt("Edit Nama:", node.data.name);
-                    if (newName && newName.trim() !== "") {
-                        myDiagram.model.startTransaction("Edit Nama");
-                        myDiagram.model.setDataProperty(node.data, "name", newName.trim());
-                        myDiagram.model.commitTransaction("Edit Nama");
-                        
-                        let person = familyData.find(p => p.id === node.data.key);
-                        if (person) {
-                            person.name = newName.trim();
-                        }
-                        updateDropdowns();
-                    }
-                }
-            });
         }
 
         function findPerson(id) {
@@ -133,6 +121,39 @@
                 updateDropdowns();
                 $('#familyForm')[0].reset();
             });
+
+            $('#exportImage').click(function() {
+                var img = myDiagram.makeImageData({ background: "white" });
+                var link = document.createElement('a');
+                link.href = img;
+                link.download = 'family-tree.png';
+                link.click();
+            });
+
+            $('#exportCsv').click(function() {
+                let csvContent = "data:text/csv;charset=utf-8," + familyData.map(e => `${e.id},${e.name},${e.parent || ''}`).join("\n");
+                var encodedUri = encodeURI(csvContent);
+                var link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "family-tree.csv");
+                document.body.appendChild(link);
+                link.click();
+            });
+
+            $('#importCsv').change(function(event) {
+                var file = event.target.files[0];
+                if (!file) return;
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var csv = e.target.result;
+                    var lines = csv.split("\n").map(line => line.split(","));
+                    familyData = lines.map(parts => ({ id: parts[0], name: parts[1], parent: parts[2] || null }));
+                    updateTree();
+                    updateDropdowns();
+                };
+                reader.readAsText(file);
+            });
+            $('#importCsv').hide();
         });
 
         function updateTree() {
