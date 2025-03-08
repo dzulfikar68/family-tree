@@ -166,6 +166,7 @@
                     updateDropdowns();
                 };
                 reader.readAsText(file);
+                window.scrollTo(0, document.body.scrollHeight);
             });
             $('#deleteSelected').click(function() {
                 let selectedNode = myDiagram.selection.first();
