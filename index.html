@@ -42,10 +42,8 @@
         <button id="exportImage" class="btn btn-success">Print Image</button>
         <button id="exportCsv" class="btn btn-warning">Export CSV</button>
         <hr>
-        <!-- <div style="display: flex; "> -->
-            <p style="font-style: italic;">Import CSV:</p>
-            <input type="file" id="importCsv" class="form-control mt-2" accept=".csv">
-        <!-- </div> -->
+        <p style="font-style: italic;">Import CSV:</p>
+        <input type="file" id="importCsv" class="form-control mt-2" accept=".csv">
         <br>
         <br>
         <br>
@@ -70,12 +68,24 @@
                     if (e.diagram.selection.count === 0) {
                         e.diagram.clearSelection();
                     }
-                }
+                },
+                "undoManager.isEnabled": true
             });
             
             myDiagram.nodeTemplate = $(go.Node, "Auto",
                 $(go.Shape, "Rectangle", { fill: "lightblue" }),
-                $(go.TextBlock, { margin: 8 }, new go.Binding("text", "name"))
+                $(go.TextBlock, { margin: 8 }, new go.Binding("text", "name"), {
+                    editable: true,
+                    textEdited: function(textBlock, oldText, newText) {
+                        let node = textBlock.part;
+                        let nodeData = node.data;
+                        let person = familyData.find(p => p.id === nodeData.key);
+                        if (person) {
+                            person.name = newText;
+                            updateDropdowns();
+                        }
+                    }
+                })
             );
             
             myDiagram.linkTemplate = $(go.Link, $(go.Shape));
@@ -132,7 +142,7 @@
                 updateTree();
                 updateDropdowns();
                 $('#familyForm')[0].reset();
-                window.scrollTo(0, document.body.scrollHeight); // Tambahkan baris ini
+                window.scrollTo(0, document.body.scrollHeight);
             });
             $('#exportImage').click(function() {
                 var img = myDiagram.makeImageData({ background: "white" });
