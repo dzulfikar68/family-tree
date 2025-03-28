@@ -44,6 +44,13 @@
         <hr>
         <p style="font-style: italic;">Import CSV:</p>
         <input type="file" id="importCsv" class="form-control mt-2" accept=".csv">
+        <hr>
+        <div class="mb-3">
+            <label class="form-label">Password (untuk simpan):</label>
+            <input type="password" id="savePassword" class="form-control">
+        </div>
+        <button id="saveToServer" class="btn btn-info">Simpan ke Server</button>
+        <button id="loadFromServer" class="btn btn-secondary">Muat Data dari Server</button>
         <br>
         <br>
         <br>
@@ -186,6 +193,47 @@
                     updateTree();
                     updateDropdowns();
                 }
+            });
+            // Fungsi simpan data ke server
+            $('#saveToServer').click(function () {
+                let password = $('#savePassword').val().trim();
+                if (!password) {
+                    alert("Masukkan password sebelum menyimpan!");
+                    return;
+                }
+
+                let familyTreeData = JSON.stringify(familyData);
+                $.ajax({
+                    // url: "save_family_tree.php",
+                    url: "https://api.dzulfikar68.my.id/native/family-tree/save_family_tree.php",
+                    type: "POST",
+                    data: { password: password, data: familyTreeData },
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function () {
+                        alert("Gagal menyimpan data!");
+                    }
+                });
+            });
+
+            // Fungsi muat data dari server
+            $('#loadFromServer').click(function () {
+                $.ajax({
+                    // url: "load_family_tree.php",
+                    url: "https://api.dzulfikar68.my.id/native/family-tree/load_family_tree.php",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        familyData = data;
+                        updateTree();
+                        updateDropdowns();
+                        alert("Data berhasil dimuat dari server!");
+                    },
+                    error: function () {
+                        alert("Gagal memuat data! Pastikan sudah ada data yang disimpan.");
+                    }
+                });
             });
         });
         function updateTree() {
